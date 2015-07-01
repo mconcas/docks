@@ -31,38 +31,37 @@ ENV \
     ALIROOT_REQ="gcc-gfortran libXpm compat-libgfortran-41 tcl \
     compat-libtermcap redhat-lsb-core"
 
+ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build 
+
 
 LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
-
-# Installing prerequisites.
-RUN yum update -y && yum install -y $GEN_REQ
-
-# Downloading and compiling CVMFS
-RUN yum install -y $CVMFS_REQ
-RUN mkdir -p $CVMFS_PATH && git clone $CVMFS_GIT_REPO $CVMFS_PATH
-RUN git --git-dir=$CVMFS_PATH/.git checkout $CVMFS_BRANCH
-RUN mkdir -p $CVMFS_BUILD_PATH
-RUN cmake -B$CVMFS_BUILD_PATH -H$CVMFS_PATH/
-RUN make -j$MJ -C$CVMFS_BUILD_PATH && make -C$CVMFS_BUILD_PATH install
-
 # Adding custom debug scripts
 COPY p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
-# Since All new files and directories are created with a UID and GID of 0...
+
+# Installing prerequisites.
+RUN yum update -y && yum install -y $GEN_REQ                                && \
+# Downloading and compiling CVMFS
+    yum install -y $CVMFS_REQ                                               && \
+    mkdir -p $CVMFS_PATH                                                    && \
+    git clone $CVMFS_GIT_REPO $CVMFS_PATH                                   && \
+    git --git-dir=$CVMFS_PATH/.git checkout $CVMFS_BRANCH                   && \
+    mkdir -p $CVMFS_BUILD_PATH                                              && \
+    cmake -B$CVMFS_BUILD_PATH -H$CVMFS_PATH/                                && \
+    make -j$MJ -C$CVMFS_BUILD_PATH                                          && \
+    make -C$CVMFS_BUILD_PATH install                                        && \
 # Setting up a test user
-
-RUN useradd -d $TEST_USER_HOME $TEST_USER
+    useradd -d $TEST_USER_HOME $TEST_USER                                   && \
 # Downloading and compiling CCTOOLS
-ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
-RUN mkdir -p $CCTOOLS_BUILD_PATH && git clone $CCTOOLS_GIT_REPO $CCTOOLS_BUILD_PATH
-RUN git --git-dir=$CCTOOLS_BUILD_PATH/.git checkout $CCTOOLS_BRANCH
-RUN chown -R $TEST_USER $CCTOOLS_PATH
-
-RUN runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && ./configure \
-     --prefix=$CCTOOLS_PATH --with-cvmfs-path=/usr/ "
-
-RUN runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && make -j$MJ && make install"
-RUN chown -R $TEST_USER $TEST_USER_HOME
-RUN runuser -l $TEST_USER -c"echo \"export PATH=\$PATH:$CCTOOLS_PATH/bin\" \
+    mkdir -p $CCTOOLS_BUILD_PATH                                            && \
+    git clone $CCTOOLS_GIT_REPO $CCTOOLS_BUILD_PATH                         && \
+    git --git-dir=$CCTOOLS_BUILD_PATH/.git checkout $CCTOOLS_BRANCH         && \
+    chown -R $TEST_USER $CCTOOLS_PATH                                       && \
+    runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && ./configure \
+      --prefix=$CCTOOLS_PATH --with-cvmfs-path=/usr/ "                      && \
+    runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && \
+      make -j$MJ && make install"                                           && \
+    chown -R $TEST_USER $TEST_USER_HOME                                     && \
+    runuser -l $TEST_USER -c"echo \"export PATH=\$PATH:$CCTOOLS_PATH/bin\" \
     >> $TEST_USER_HOME/.bashrc"
 
 # AliRoot things
