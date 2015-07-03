@@ -2,7 +2,6 @@
 # basic wrapper script to enter in a cvmfs-aware environment
 #
 
-export WORKSPACE="${TOPDIR}/workspace"
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
 export PARROT_CVMFS_REPO="<default-repositories> \
   alice-ocdb.cern.ch:\
