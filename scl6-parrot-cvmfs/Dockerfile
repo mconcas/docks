@@ -65,6 +65,6 @@ RUN yum update -y && yum install -y $GEN_REQ                                && \
     >> $TEST_USER_HOME/.bashrc"
 
 # AliRoot things
-# RUN yum install -y $ALIROOT_REQ
+RUN yum install -y $ALIROOT_REQ
 # This tricks the alienv script...
-# COPY os-release /etc/os-release
+COPY os-release /etc/os-release
