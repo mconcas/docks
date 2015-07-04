@@ -4,7 +4,7 @@
 # See: github.com/cooperative-computing-lab/cctools and
 #      http://ccl.cse.nd.edu/software/manuals/parrot.html
 
-FROM hepsw/slc-base:latest
+FROM centos:centos6
 MAINTAINER Matteo Concas mconcas@cern.ch
 
 # Environmental variables.
