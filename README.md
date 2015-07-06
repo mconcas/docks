@@ -1,5 +1,5 @@
-How to setup a CVMFS-aware container based on CentOS 6 and cctools-parrot
-================================================================================
+How to setup a CVMFS-aware container using parrot (from cctools)
+================================================================
 
 Author [Matteo Concas](mailto:matteo.concas@cern.ch)
 
