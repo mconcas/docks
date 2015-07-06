@@ -108,11 +108,15 @@ params (it supports TAB-autocompletion for the <reponame>:<tag> arg):
     bash-4.1#
 
 ### Try parrot_run
-*...and eventually trigger your Mandatory Access Controllers*
+*...and eventually trigger your Mandatory Access Controllers*  
 Login as a test-user, in order to use parrot_run in a user-environment,
 as it was thought.
 You will find an environmental variable called TEST_USER.
-So, '$ su $TEST_USER' and try '$ parrot_run -d all ls' for a debug run.
+
+    $ su $TEST_USER
+    $ parrot_run -d all ls
+
+For a debug run.
 if the last lines are telling you **something different** from:
 
     parrot_run[9] process: ls exited normally with status 0
@@ -136,11 +140,10 @@ On Ubuntu nodes it may happen that the last 4 lines of the output are:
     goodbye!  
     Terminated
 
-You can eventually tail your kernel log: '$ dmesg | tail -n1'
+You can eventually tail your kernel log:
 
-   <span style="color:red">apparmor="DENIED"</span> operation="ptrace"
-   profile="docker-default" pid=2412 comm="parrot_run" requested_mask="trace"
-   denied_mask="trace" peer="docker-default"
+    $ dmesg | tail -n1
+    apparmor="DENIED" operation="ptrace" profile="docker-default" pid=2412 comm="parrot_run" requested_mask="trace" denied_mask="trace" peer="docker-default"
 
 Long story short: this is because Apparmor does not allow to "setuid root"
 processes to *ptrace* other processes.
@@ -163,15 +166,13 @@ A custom profile needs to be named as *path.to.docker.binary*.
 We are copying the default one /etc/apparmor.d/doker and renaming in the form
 we need.  
 
-
-    sudo cp /etc/apparmor.d/docker /etc/apparmor.d/`which docker |
-    sed 's:/:.:g' | cut -c2-`
+    sudo cp /etc/apparmor.d/docker /etc/apparmor.d/`which docker | sed 's:/:.:g' | cut -c2-`
 
 Then we have to force apparmor to a complain mode, in that way it will log
 every *naughty* operation but it won't block that.
 
     $ sudo aa-complain usr.bin.docker
-    $ Setting /etc/apparmor.d/usr.bin.docker to complain mode.
+    Setting /etc/apparmor.d/usr.bin.docker to complain mode.
     $ sudo service docker restart
 
 Now docker would be able to do **any** operation.
@@ -186,8 +187,6 @@ environment properly configured with a working CVMFS implementation.
 
     # su $TEST_USER
     $ . /home/parrotester/p_cvmfs_env.sh
-    <span style="color:green">(parrot_env)</span> [parrotester@xxx ~]$
-    <span style="color:green">(parrot_env)</span> [parrotester@xxx ~]$
-    ls /cvmfs/alice.cern.ch
-    bin  calibration  etc  x86_64-2.6-gnu-4.1.2  x86_64-2.6-gnu-4.7.2  
-    x86_64-2.6-gnu-4.8.3  x86_64-2.6-gnu-4.8.4
+    (parrot_env) [parrotester@xxx ~]$
+    (parrot_env) [parrotester@xxx ~]$ ls /cvmfs/alice.cern.ch
+    bin  calibration  etc  x86_64-2.6-gnu-4.1.2  x86_64-2.6-gnu-4.7.2  x86_64-2.6-gnu-4.8.3  x86_64-2.6-gnu-4.8.4
