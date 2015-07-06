@@ -102,7 +102,7 @@ database the specified tags, you can verify it running:
 
 ### Run an interactive shell into your container
 You can try interactively your new container simply running a shell with *-it*
-params (it supports TAB-autocompletion for the <reponame>:<tag> arg):
+params (it supports TAB-autocompletion for the < reponame >:< tag > arg):
 
     $ docker run --rm -it <reponame>:<tag> /bin/bash
     bash-4.1#
@@ -177,7 +177,7 @@ every *naughty* operation but it won't block that.
 
 Now docker would be able to do **any** operation.
 
-#### Selinux issue
+#### Selinux issues
 Currently I don't have encountered a really effective Selinux block for  
 *ptrace* calls. I bet I will, so for now i'll let this section blank.
 
