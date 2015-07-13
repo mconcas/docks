@@ -34,21 +34,23 @@ host service like Dockerhub or to manually build it on your own host using a
 
 ### Get it from Dockerhub
 This is the quick way.
-A dedicated [Dockerhub](mconcas/parrotcvmfs) repo is currently available.
+A dedicated
+[Dockerhub](https://registry.hub.docker.com/u/mconcas/parrotcvmfs-autobuild/)
+repository is currently available.
 Supposing that you have added your user to the *docker* group, in order to run
 docker commands without specifying *sudo*, you can pull the image you prefer
 choosing from the currently available in the repo.
 You can choose whether use a **centos6-based** image or **scl6-based** one.
 Then
 
-    $ docker pull mconcas/parrotcvmfs:centos6
+    $ docker pull mconcas/parrotcvmfs-autobuild:centos6-autobuild
 
 or
 
-    $ docker pull mconcas/parrotcvmfs:scl6
+    $ docker pull mconcas/parrotcvmfs-autobuild:scl6-autobuild
 
 ### Build it locally
-Otherwise can clone directly this [Github](https://github.com/mconcas/docks.git)
+Otherwise can clone directly this [GitHub](https://github.com/mconcas/docks.git)
 repository and build the image on your own.
 
     $ git clone https://github.com/mconcas/docks.git
@@ -61,7 +63,14 @@ type (*note that this command accepts relative paths*):
 The alias <reponame> stands for a local repository you build on your local
 machine whereas the <tag> alias specifies a tag for your own build.
 It's *warmly* recommended to set these two parameters in order to ease
-the images management.  
+the images management.
+
+Please notice that the DockerHub repository is kept in sync with the GitHub
+one (see below) since  the
+[autobuild](https://docs.docker.com/docker-hub/builds/#creating-an-automated-build)
+has been configured.  
+That is the two procedures here described must lead, if successfully completed,
+to the same result.
 
 ### Known name-resolving issue with Ubuntu Linux (14.10)
 **Important: read below just in case during your building phase you container
