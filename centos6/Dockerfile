@@ -31,7 +31,7 @@ ENV \
     ALIROOT_REQ="gcc-gfortran libXpm compat-libgfortran-41 tcl \
     compat-libtermcap redhat-lsb-core"
 
-ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build 
+ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 
 
 LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
@@ -49,6 +49,10 @@ RUN yum update -y && yum install -y $GEN_REQ                                && \
     cmake -B$CVMFS_BUILD_PATH -H$CVMFS_PATH/                                && \
     make -j$MJ -C$CVMFS_BUILD_PATH                                          && \
     make -C$CVMFS_BUILD_PATH install                                        && \
+# I found that cmake leaves some trashes all around, let's remove them...
+    rm -Rf /CMakeLists.txt /externals /cvmfs                                && \
+# Fix for a parrot_run complain
+    mkdir -p /cvmfs/.modulerc                                               && \
 # Setting up a test user
     useradd -d $TEST_USER_HOME $TEST_USER                                   && \
 # Downloading and compiling CCTOOLS
