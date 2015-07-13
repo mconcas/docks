@@ -35,7 +35,7 @@ host service like Dockerhub or to manually build it on your own host using a
 ### Get it from Dockerhub
 This is the quick way.
 A dedicated
-[Dockerhub](https://registry.hub.docker.com/u/mconcas/parrotcvmfs-autobuild/)
+[DockerHub](https://registry.hub.docker.com/u/mconcas/parrotcvmfs-autobuild/)
 repository is currently available.
 Supposing that you have added your user to the *docker* group, in order to run
 docker commands without specifying *sudo*, you can pull the image you prefer
@@ -66,11 +66,11 @@ It's *warmly* recommended to set these two parameters in order to ease
 the images management.
 
 Please notice that the DockerHub repository is kept in sync with the GitHub
-one (see below) since  the
+one, since  the
 [autobuild](https://docs.docker.com/docker-hub/builds/#creating-an-automated-build)
 has been configured.  
 That is the two procedures here described must lead, if successfully completed,
-to the same result.
+to the same results.
 
 ### Known name-resolving issue with Ubuntu Linux (14.10)
 **Important: read below just in case during your building phase you container
