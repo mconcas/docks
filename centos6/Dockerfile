@@ -24,14 +24,15 @@ ENV \
 
 # Generic prerequisites
     COMM_REQ="git cmake tar unzip gcc gcc-c++ patch zlib-devel openssl-devel \
-    openssl-devel make"
+    openssl-devel make" \
 
     MJ=9 \
 # Software-specific prerquisites
 # from: https://dberzano.github.io/install-aliroot
 # Root
     ROOT_REQ="autoconf automake libtool libxml2-devel libX11-devel libXpm-devel \
-    libXft-devel libXext-devel mesa-libGLU-devel CGAL-devel subversion"
+    libXft-devel libXext-devel mesa-libGLU-devel CGAL-devel subversion" \
+
 # AliRoot
     ALIROOT_REQ="libXpm compat-libgfortran-41 tcl \
     compat-libtermcap redhat-lsb-core"
