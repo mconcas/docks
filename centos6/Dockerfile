@@ -14,21 +14,26 @@ ENV \
     CVMFS_GIT_REPO="https://github.com/cvmfs/cvmfs.git" \
     CVMFS_BRANCH="libcvmfs-stable" \
     CVMFS_PATH=/opt/cvmfs CVMFS_BUILD_PATH=/opt/cvmfs/build \
-    CVMFS_REQ="libattr-devel zlib-devel openssl-devel libuuid-devel \
+    CVMFS_REQ="libattr-devel libuuid-devel \
     fuse-devel python-devel" \
 # CCTOOLS environment
     CCTOOLS_GIT_REPO="https://github.com/cooperative-computing-lab/cctools.git" \
     CCTOOLS_BRANCH="master" \
 # Personal choice...
     CCTOOLS_PATH=/opt/cctools \
-    # CCTOOLS_BUILD_PATH=opt/cctools/build \
 
 # Generic prerequisites
-    GEN_REQ="git cmake tar unzip gcc gcc-c++ patch " \
+    COMM_REQ="git cmake tar unzip gcc gcc-c++ patch zlib-devel openssl-devel \
+    openssl-devel make"
+
     MJ=9 \
 # Software-specific prerquisites
-# from dberzano.github.io/alice/install-aliroot/cvmfs/#install_aliroot_requirements
-    ALIROOT_REQ="gcc-gfortran libXpm compat-libgfortran-41 tcl \
+# from: https://dberzano.github.io/install-aliroot
+# Root
+    ROOT_REQ="autoconf automake libtool libxml2-devel libX11-devel libXpm-devel \
+    libXft-devel libXext-devel mesa-libGLU-devel CGAL-devel subversion"
+# AliRoot
+    ALIROOT_REQ="libXpm compat-libgfortran-41 tcl \
     compat-libtermcap redhat-lsb-core"
 
 ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
@@ -39,7 +44,7 @@ LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
 COPY p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 
 # Installing prerequisites.
-RUN yum update -y && yum install -y $GEN_REQ                                && \
+RUN yum update -y && yum install -y $COMM_REQ                               && \
 # Downloading and compiling CVMFS
     yum install -y $CVMFS_REQ                                               && \
     mkdir -p $CVMFS_PATH                                                    && \
@@ -68,7 +73,13 @@ RUN yum update -y && yum install -y $GEN_REQ                                && \
     runuser -l $TEST_USER -c"echo \"export PATH=\$PATH:$CCTOOLS_PATH/bin\" \
     >> $TEST_USER_HOME/.bashrc"
 
-# AliRoot things
-RUN yum install -y $ALIROOT_REQ
+# Root & AliRoot things
+RUN yum install -y $ROOT_REQ $ALIROOT_REQ
+
+# Condor setup NOT customization.
+RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
+    http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-development-rhel6.repo && \
+    yum install -y condor
+
 # This tricks the alienv script...
 COPY os-release /etc/os-release
