@@ -199,3 +199,5 @@ environment properly configured with a working CVMFS implementation.
     (parrot_env) [parrotester@xxx ~]$
     (parrot_env) [parrotester@xxx ~]$ ls /cvmfs/alice.cern.ch
     bin  calibration  etc  x86_64-2.6-gnu-4.1.2  x86_64-2.6-gnu-4.7.2  x86_64-2.6-gnu-4.8.3  x86_64-2.6-gnu-4.8.4
+
+### Configure a [Condor](http://research.cs.wisc.edu/htcondor/) worker node

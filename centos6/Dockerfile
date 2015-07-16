@@ -42,7 +42,7 @@ ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 
 LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
 # Adding custom debug scripts
-COPY p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
+COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 
 # Installing prerequisites.
 RUN yum update -y && yum install -y $COMM_REQ                               && \
@@ -83,7 +83,7 @@ RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
     yum install -y condor
 
 # This tricks the alienv script...
-COPY os-release /etc/os-release
+COPY opt/os-release /etc/os-release
 
 # Just for a quick developing... not intended to be mainstream.
-COPY condor-worker-setup.sh /tmp/condor-worker-setup.sh
+COPY opt/condor-worker-setup.sh /tmp/condor-worker-setup.sh
