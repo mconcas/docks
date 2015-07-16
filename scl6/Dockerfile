@@ -72,3 +72,6 @@ RUN yum update -y && yum install -y $GEN_REQ                                && \
 RUN yum install -y $ALIROOT_REQ
 # This tricks the alienv script...
 COPY os-release /etc/os-release
+
+# Just for a quick developing... not intended to be mainstream.
+COPY condor-worker-setup.sh /tmp/condor-worker-setup.sh
