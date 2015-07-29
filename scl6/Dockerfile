@@ -39,6 +39,8 @@ ENV \
 
 ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 
+# It can be substitute by something more 'unique'. No need for that atm.
+LABEL container.label=worker-node 
 
 LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
 # Adding custom debug scripts
