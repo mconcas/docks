@@ -34,20 +34,21 @@ host service like Dockerhub or to manually build it on your own host using a
 
 ### Get it from Dockerhub
 This is the quick way.
-A dedicated
-[DockerHub](https://registry.hub.docker.com/u/mconcas/parrotcvmfs-autobuild/)
-repository is currently available.
+Two dedicated
+[DockerHub 1](https://hub-beta.docker.com/r/mconcas/centos6-autobuild-container/)
+[DockerHub 2](https://hub-beta.docker.com/r/mconcas/scl6-autobuild-container/)
+repositories are currently available.
 Supposing that you have added your user to the *docker* group, in order to run
 docker commands without specifying *sudo*, you can pull the image you prefer
 choosing from the currently available in the repo.
 You can choose whether use a **centos6-based** image or **scl6-based** one.
 Then
 
-    $ docker pull mconcas/parrotcvmfs-autobuild:centos6-autobuild
+    $ docker pull mconcas/centos6-autobuild-container:latest
 
 or
 
-    $ docker pull mconcas/parrotcvmfs-autobuild:scl6-autobuild
+    $ docker pull mconcas/scl6-autobuild-container:latest
 
 ### Build it locally
 Otherwise can clone directly this [GitHub](https://github.com/mconcas/docks.git)

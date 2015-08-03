@@ -6,7 +6,7 @@ Run:
 ```bash
    <...clone this repository and cd scl6-parrot-cvmfs...>
    $ docker build -t test:testing .
-   <...pray your gods...>
+   <...wait minutes...>
    $ docker run --rm -ti test:testing /bin/bash
 
    # su $TEST_USER
