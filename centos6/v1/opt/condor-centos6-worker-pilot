@@ -2,6 +2,7 @@
 
 export CONDOR_CONFIG_DIR="/etc/condor/config.d/"
 pilot_sleep_s=120
+condor_master_ping_s=4
 
 # Check if root
 
@@ -16,10 +17,10 @@ wget https://gist.githubusercontent.com/mconcas/f2847b7c3b362b22a7cb/raw/f5f526a
 wget https://gist.githubusercontent.com/mconcas/6e9b6b5e729f4606459d/raw/3ad143367304af27d96c98afbce17a1a7fe2d2b4/20-common-schedd-docker.config -P$CONDOR_CONFIG_DIR &> /dev/null
 wget https://gist.githubusercontent.com/mconcas/e5e1770248f4ee697587/raw/17a7c2ee3960894f4b97b7198b4d1b7e0c6aaa85/99-common-debug-docker.config -P$CONDOR_CONFIG_DIR &> /dev/null
 
-echo " done"
-echo "Copying credentials..."
+echo " done."
+echo -n "Copying credentials..."
 condor_store_cred add -c -p mycondorpassword &> /dev/null
-
+echo " done."
 #### From her it's all MERELY COPYED FROM:
 #### https://github.com/dberzano/cernvm-alice-docker/blob/master/condor-cvm-docker-pilot
 #### All credits to <dberzano@cern.ch>
@@ -32,7 +33,7 @@ echo 'done'
 # Wait one second and check if we have the PID
 echo -n "Fetching Condor Master's PID..."
 sleep 1
-condor_master_pidfile=/var/run/condor/condor.pid
+condor_master_pidfile=/var/run/condor/condor_master.pid
 condor_master_pid=$( cat "$condor_master_pidfile" 2> /dev/null )
 
 # Turn off exit-on-error (we have some ifs)
