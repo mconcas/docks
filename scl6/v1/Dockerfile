@@ -40,14 +40,14 @@ ENV \
 ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 
 # It can be substitute by something more 'unique'. No need for that atm.
-LABEL container.label=worker-node 
+LABEL container.label=worker-node
 
 LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
 # Adding custom debug scripts
 COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 
 # Installing prerequisites.
-RUN yum update -y && yum install -y $COMM_REQ                               && \
+RUN yum install -y $COMM_REQ                               && \
 # Downloading and compiling CVMFS
     yum install -y $CVMFS_REQ                                               && \
     mkdir -p $CVMFS_PATH                                                    && \
@@ -88,4 +88,4 @@ RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
 COPY opt/os-release /etc/os-release
 
 # Just for a quick developing... not intended to be mainstream.
-COPY opt/condor-worker-setup.sh /tmp/condor-worker-setup.sh
+COPY opt/condor-centos6-worker-pilot /tmp/condor-centos6-worker-pilot
