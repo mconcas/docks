@@ -17,17 +17,14 @@ python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' |\
 base64  --decode > /etc/condor/config.d/00-worker.config
 
 # 10-common.config
-curl https://api.github.com/repos/mconcas/docks/contents/conf/10-worker.config |\
+curl https://api.github.com/repos/mconcas/docks/contents/conf/10-common.config |\
 python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' |\
-base64  --decode > /etc/condor/config.d/00-worker.config
+base64  --decode > /etc/condor/config.d/10-worker.config
 
 echo " done."
 echo -n "Copying credentials..."
 condor_store_cred add -c -p mycondorpassword &> /dev/null
 echo " done."
-#### From her it's all MERELY COPYED FROM:
-#### https://github.com/dberzano/cernvm-alice-docker/blob/master/condor-cvm-docker-pilot
-#### All credits to <dberzano@cern.ch>
 
 # Start Condor
 echo -n 'Starting Condor...'
