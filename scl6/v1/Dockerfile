@@ -35,7 +35,10 @@ ENV \
 
 # AliRoot
     ALIROOT_REQ="libXpm compat-libgfortran-41 tcl \
-    compat-libtermcap redhat-lsb-core"
+    compat-libtermcap redhat-lsb-core" \
+
+# Condor Password
+    CONDOR_SECRET="@mycondorpassword@"
 
 ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 
