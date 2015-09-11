@@ -1,6 +1,8 @@
 #!/bin/bash
 
 export CONDOR_CONFIG_DIR="/etc/condor/config.d/"
+export CONFIG_COMM_PATH="/tmp/voluntary-config/condor-configuration/common"
+
 pilot_sleep_s=120
 condor_master_ping_s=4
 
@@ -12,11 +14,14 @@ if [ `id -u` != "0" ]; then
 fi
 yum install -y wget &>/dev/null
 echo -n "Condor initialization..."
-curl https://api.github.com/repos/mconcas/docks/contents/conf/00-worker.config | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > $CONDOR_CONFIG_DIR/00-worker.config
-curl https://api.github.com/repos/mconcas/docks/contents/conf/10-common.config | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > $CONDOR_CONFIG_DIR/10-common.config
-curl https://api.github.com/repos/mconcas/docks/contents/conf/condor_config    | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > /etc/condor/condor_config
+echo -m "Downloading configurations..."
 
+git clone https://github.com/mconcas/voluntary-config.git /tmp/voluntary-config
+mv $CONFIG_COMM_PATH/condor_config /etc/condor/condor_config
+mv $CONFIG_COMM_PATH/00-worker.config $CONDOR_CONFIG_DIR/00-worker.config
+mv $CONFIG_COMM_PATH/10-common.config $CONDOR_CONFIG_DIR/10-common.config
 echo " done."
+
 echo -n "Copying credentials..."
 condor_store_cred add -c -p $CONDOR_SECRET &> /dev/null
 unset CONDOR_SECRET

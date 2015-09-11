@@ -1,3 +1,4 @@
+
 # DockerFile for SCL6 with a working parrot+cvmfs implementation.
 #
 # See: github.com/cvmfs/cvmfs and cernvm.cern.ch/portal/filesystem
@@ -92,4 +93,4 @@ COPY opt/os-release /etc/os-release
 
 # Just for a quick developing... not intended to be mainstream.
 COPY opt/condor-centos6-worker-pilot /tmp/condor-centos6-worker-pilot
-RUN chmod +x /tmp/condor-centos6-worker-pilot
+RUN chmod +x /tmp/condor-scl6-worker-pilot
