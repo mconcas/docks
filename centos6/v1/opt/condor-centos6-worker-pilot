@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 export CONDOR_CONFIG_DIR="/etc/condor/config.d/"
@@ -12,18 +13,13 @@ if [ `id -u` != "0" ]; then
 fi
 yum install -y wget &>/dev/null
 echo -n "Condor initialization..."
-wget https://gist.githubusercontent.com/mconcas/dd6d3dbf48519d71d07c/raw/ddbae134c647aa26283ef8f674e8c72d2db767b8/00-docker-worker.config -P$CONDOR_CONFIG_DIR &> /dev/null
-wget https://gist.githubusercontent.com/mconcas/f2847b7c3b362b22a7cb/raw/4a9cebbc43c18267bb611d5dfd93dad0fd065ad6/10-common-docker.config -P$CONDOR_CONFIG_DIR &> /dev/null
-wget https://gist.githubusercontent.com/mconcas/6e9b6b5e729f4606459d/raw/3ad143367304af27d96c98afbce17a1a7fe2d2b4/20-common-schedd-docker.config -P$CONDOR_CONFIG_DIR &> /dev/null
-wget https://gist.githubusercontent.com/mconcas/e5e1770248f4ee697587/raw/50a0290979604b26c7d2dd85d34cd460629d770c/99-common-debug-docker.config -P$CONDOR_CONFIG_DIR &> /dev/null
+curl https://api.github.com/repos/mconcas/docks/contents/conf/00-worker.config | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > /etc/condor/config.d/00-worker.config
+curl https://api.github.com/repos/mconcas/docks/contents/conf/10-common.config | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > /etc/condor/config.d/10-common.config
 
 echo " done."
 echo -n "Copying credentials..."
 condor_store_cred add -c -p mycondorpassword &> /dev/null
 echo " done."
-#### From her it's all MERELY COPYED FROM:
-#### https://github.com/dberzano/cernvm-alice-docker/blob/master/condor-cvm-docker-pilot
-#### All credits to <dberzano@cern.ch>
 
 # Start Condor
 echo -n 'Starting Condor...'

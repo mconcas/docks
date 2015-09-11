@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 export CONDOR_CONFIG_DIR="/etc/condor/config.d/"
@@ -5,21 +6,15 @@ pilot_sleep_s=120
 condor_master_ping_s=4
 
 # Check if root
+
 if [ `id -u` != "0" ]; then
     echo " Run this script as root."
     exit 1
 fi
 yum install -y wget &>/dev/null
-echo -n "Downloading HTCondor configuration files..."
-# 00-worker.config
-curl https://api.github.com/repos/mconcas/docks/contents/conf/00-worker.config |\
-python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' |\
-base64  --decode > /etc/condor/config.d/00-worker.config
-
-# 10-common.config
-curl https://api.github.com/repos/mconcas/docks/contents/conf/10-common.config |\
-python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' |\
-base64  --decode > /etc/condor/config.d/10-worker.config
+echo -n "Condor initialization..."
+curl https://api.github.com/repos/mconcas/docks/contents/conf/00-worker.config | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > /etc/condor/config.d/00-worker.config
+curl https://api.github.com/repos/mconcas/docks/contents/conf/10-common.config | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["content"]' | base64 --decode > /etc/condor/config.d/10-common.config
 
 echo " done."
 echo -n "Copying credentials..."
