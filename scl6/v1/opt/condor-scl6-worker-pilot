@@ -6,8 +6,20 @@ export CONFIG_COMM_PATH="/tmp/voluntary-config/condor-configuration/common"
 pilot_sleep_s=120
 condor_master_ping_s=4
 
-# Check if root
+trap condor_peacefully_off SIGTERM
 
+function condor_peacefully_off() {
+   # Peacefully turning the master off. Master controls startd. "Peacefully" means that no turn off
+   # will occur until every running job has finished. So, if no job is running, exit immediately
+   echo -n 'Request a peaceful shutdown to the Condor Master...'
+   set -e
+   condor_off -daemon master -peaceful > /dev/null 2>&1
+   set +e
+   echo 'request sent'
+
+}
+
+# Check if root
 if [ `id -u` != "0" ]; then
     echo " Run this script as root."
     exit 1
@@ -68,13 +80,7 @@ for (( i=0 ; i<$pilot_sleep_s ; i++ )) ; do
 done
 echo 'done waiting'
 
-# Peacefully turning the master off. Master controls startd. "Peacefully" means that no turn off
-# will occur until every running job has finished. So, if no job is running, exit immediately
-echo -n 'Request a peaceful shutdown to the Condor Master...'
-set -e
-condor_off -daemon master -peaceful > /dev/null 2>&1
-set +e
-echo 'request sent'
+condor_peacefully_off
 
 # Begin the wait...
 while [[ 1 ]] ; do
