@@ -24,15 +24,15 @@ if [ `id -u` != "0" ]; then
     echo " Run this script as root."
     exit 1
 fi
-yum install -y wget &>/dev/null
-echo -n "Condor initialization..."
-echo -m "Downloading configurations..."
+# yum install -y wget &>/dev/null
+# echo -n "Condor initialization..."
+# echo -m "Downloading configurations..."
 
-git clone https://github.com/mconcas/voluntary-config.git /tmp/voluntary-config
-mv $CONFIG_COMM_PATH/condor_config /etc/condor/condor_config
-mv $CONFIG_COMM_PATH/00-worker.config $CONDOR_CONFIG_DIR/00-worker.config
-mv $CONFIG_COMM_PATH/10-common.config $CONDOR_CONFIG_DIR/10-common.config
-echo " done."
+# git clone https://github.com/mconcas/voluntary-config.git /tmp/voluntary-config
+# mv $CONFIG_COMM_PATH/condor_config /etc/condor/condor_config
+# mv $CONFIG_COMM_PATH/00-worker.config $CONDOR_CONFIG_DIR/00-worker.config
+# mv $CONFIG_COMM_PATH/10-common.config $CONDOR_CONFIG_DIR/10-common.config
+# echo " done."
 
 echo -n "Copying credentials..."
 condor_store_cred add -c -p $CONDOR_SECRET &> /dev/null
