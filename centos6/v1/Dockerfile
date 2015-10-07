@@ -46,7 +46,7 @@ ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 
 # Installing prerequisites.
-RUN yum install -y $COMM_REQ                               && \
+RUN yum install -y $COMM_REQ                                                && \
 # Downloading and compiling CVMFS
     yum install -y $CVMFS_REQ                                               && \
     mkdir -p $CVMFS_PATH                                                    && \
@@ -81,7 +81,7 @@ RUN yum install -y $COMM_REQ                               && \
 # Root & AliRoot things
 RUN yum install -y $ROOT_REQ $ALIROOT_REQ
 
-# Condor setup NOT customization.
+# Condor setup.
 RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
     http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-development-rhel6.repo && \
     yum install -y condor
