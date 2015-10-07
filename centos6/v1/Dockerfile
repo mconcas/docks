@@ -8,7 +8,7 @@ FROM centos:centos6
 MAINTAINER Matteo Concas mconcas@cern.ch
 
 # Environmental variables.
-ENV TEST_USER="parrotester" TEST_USER_HOME="/home/parrotester"
+ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"
 ENV \
 # CVMFS environment
     CVMFS_GIT_REPO="https://github.com/cvmfs/cvmfs.git" \
@@ -24,7 +24,7 @@ ENV \
 
 # Generic prerequisites
     COMM_REQ="git cmake tar unzip gcc gcc-c++ patch zlib-devel openssl-devel \
-    openssl-devel make" \
+    openssl-devel make which vim" \
 
     MJ=9 \
 # Software-specific prerquisites
@@ -42,11 +42,7 @@ ENV \
     
 ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
 
-# It can be substitute by something more 'unique'. No need for that atm.
-LABEL container.label=worker-node
-
-LABEL branch.cvmfs=$CVMFS_BRANCH branch.cctools=$CCTOOLS_BRANCH
-# Adding custom debug scripts
+# Adding interactive parrot-wrapper, useful for debug and develop.
 COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 
 # Installing prerequisites.
@@ -60,8 +56,8 @@ RUN yum install -y $COMM_REQ                               && \
     cmake -B$CVMFS_BUILD_PATH -H$CVMFS_PATH/                                && \
     make -j$MJ -C$CVMFS_BUILD_PATH                                          && \
     make -C$CVMFS_BUILD_PATH install                                        && \
-# I found that cmake leaves some trashes all around, let's remove them...
-    rm -Rf /CMakeLists.txt /externals /cvmfs                                && \
+# I found that cmake leaves some stuff all around, let's remove them...
+    rm -Rf /CMakeLists.txt /externals /cvmfs $CVMFS_PATH                    && \
 # Fix for a parrot_run complain
     mkdir -p /cvmfs/.modulerc                                               && \
 # Setting up a test user
@@ -76,8 +72,11 @@ RUN yum install -y $COMM_REQ                               && \
     runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && \
       make -j$MJ && make install"                                           && \
     chown -R $TEST_USER $TEST_USER_HOME                                     && \
-    runuser -l $TEST_USER -c"echo \"export PATH=\$PATH:$CCTOOLS_PATH/bin\" \
-    >> $TEST_USER_HOME/.bashrc"
+    runuser -l $TEST_USER -c "echo \"export PATH=\$PATH:$CCTOOLS_PATH/bin\"    \
+       >> $TEST_USER_HOME/.bashrc"                                          && \
+    runuser -l $TEST_USER -c                                                   \
+       "echo \"alias ali='source /cvmfs/alice.cern.ch/etc/login.sh'\"          \
+       >> $TEST_USER_HOME/.bashrc"
 
 # Root & AliRoot things
 RUN yum install -y $ROOT_REQ $ALIROOT_REQ
@@ -90,6 +89,6 @@ RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
 # This tricks the alienv script...
 COPY opt/os-release /etc/os-release
 
-# Just for a quick developing... not intended to be mainstream.
+# Pilot injection.
 COPY opt/condor-centos6-worker-pilot /tmp/condor-centos6-worker-pilot
 RUN chmod +x /tmp/condor-centos6-worker-pilot
