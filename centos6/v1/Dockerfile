@@ -1,4 +1,4 @@
-# DockerFile for SCL6 with a working parrot+cvmfs implementation.
+# DockerFile for Centos6 with a working parrot+cvmfs installation.
 #
 # See: github.com/cvmfs/cvmfs and cernvm.cern.ch/portal/filesystem
 # See: github.com/cooperative-computing-lab/cctools and
@@ -7,79 +7,47 @@
 FROM centos:centos6
 MAINTAINER Matteo Concas mconcas@cern.ch
 
-# Environmental variables.
-ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"
-ENV \
-# CVMFS environment
-    CVMFS_GIT_REPO="https://github.com/cvmfs/cvmfs.git" \
-    CVMFS_BRANCH="libcvmfs-stable" \
-    CVMFS_PATH=/opt/cvmfs CVMFS_BUILD_PATH=/opt/cvmfs/build \
-    CVMFS_REQ="libattr-devel libuuid-devel \
-    fuse-devel python-devel" \
-# CCTOOLS environment
-    CCTOOLS_GIT_REPO="https://github.com/cooperative-computing-lab/cctools.git" \
-    CCTOOLS_BRANCH="master" \
-# Personal choice...
-    CCTOOLS_PATH=/opt/cctools \
-
-# Generic prerequisites
-    COMM_REQ="git cmake tar unzip gcc gcc-c++ patch zlib-devel openssl-devel \
-    openssl-devel make which vim" \
-
-    MJ=9 \
-# Software-specific prerquisites
-# from: https://dberzano.github.io/install-aliroot
-# Root
-    ROOT_REQ="autoconf automake libtool libxml2-devel libX11-devel libXpm-devel \
-    libXft-devel libXext-devel mesa-libGLU-devel CGAL-devel subversion" \
-
-# AliRoot
-    ALIROOT_REQ="libXpm compat-libgfortran-41 tcl \
-    compat-libtermcap redhat-lsb-core" \
-
-# Condor Password
-    CONDOR_SECRET="@mycondorpassword@"
+# Environment variables.
+ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"                                       \
+    PATH=/opt/cctools/cctools-5.2.3-x86_64-redhat6/bin:$PATH                                       \
+    # CCTools
+    CCTOOLS_URL=http://ccl.cse.nd.edu/software/files/cctools-5.2.3-x86_64-redhat6.tar.gz           \
+    CCTOOLS_PATH=/opt/cctools                                                                      \
     
-ENV CCTOOLS_BUILD_PATH=$CCTOOLS_PATH/build
+    # Compile flag
+    MJ=9                                                                                           \
+    # Generic prerequisites
+    COMM_REQ="git cmake tar unzip gcc gcc-c++ patch zlib-devel openssl-devel                       \
+        openssl-devel make which vim libcap-2-devel"                                               \
+    # Software-specific requisites
+    # See: https://dberzano.github.io/install-aliroot
+    # Root
+    ROOT_REQ="autoconf automake libtool libxml2-devel libX11-devel libXpm-devel                    \
+        libXft-devel libXext-devel mesa-libGLU-devel CGAL-devel subversion"                        \
+    
+    # AliRoot
+    ALIROOT_REQ="libXpm compat-libgfortran-41 tcl                                                  \
+        compat-libtermcap redhat-lsb-core"                                                         \
+
+    # Condor Password
+    CONDOR_SECRET="@mycondorpassword@"                                                                                                     
 
 # Adding interactive parrot-wrapper, useful for debug and develop.
 COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 
-# Installing prerequisites.
-RUN yum install -y $COMM_REQ                                                && \
-# Downloading and compiling CVMFS
-    yum install -y $CVMFS_REQ                                               && \
-    mkdir -p $CVMFS_PATH                                                    && \
-    git clone $CVMFS_GIT_REPO $CVMFS_PATH                                   && \
-    git --git-dir=$CVMFS_PATH/.git checkout $CVMFS_BRANCH                   && \
-    mkdir -p $CVMFS_BUILD_PATH                                              && \
-    cmake -B$CVMFS_BUILD_PATH -H$CVMFS_PATH/                                && \
-    make -j$MJ -C$CVMFS_BUILD_PATH                                          && \
-    make -C$CVMFS_BUILD_PATH install                                        && \
-# I found that cmake leaves some stuff all around, let's remove them...
-    rm -Rf /CMakeLists.txt /externals /cvmfs $CVMFS_PATH                    && \
-# Fix for a parrot_run complain
-    mkdir -p /cvmfs/.modulerc                                               && \
-# Setting up a test user
-    useradd -d $TEST_USER_HOME $TEST_USER                                   && \
-# Downloading and compiling CCTOOLS
-    mkdir -p $CCTOOLS_BUILD_PATH                                            && \
-    git clone $CCTOOLS_GIT_REPO $CCTOOLS_BUILD_PATH                         && \
-    git --git-dir=$CCTOOLS_BUILD_PATH/.git checkout $CCTOOLS_BRANCH         && \
-    chown -R $TEST_USER $CCTOOLS_PATH                                       && \
-    runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && ./configure \
-      --prefix=$CCTOOLS_PATH --with-cvmfs-path=/usr/ "                      && \
-    runuser -l $TEST_USER -c "cd $CCTOOLS_BUILD_PATH && \
-      make -j$MJ && make install"                                           && \
-    chown -R $TEST_USER $TEST_USER_HOME                                     && \
-    runuser -l $TEST_USER -c "echo \"export PATH=\$PATH:$CCTOOLS_PATH/bin\"    \
-       >> $TEST_USER_HOME/.bashrc"                                          && \
-    runuser -l $TEST_USER -c                                                   \
-       "echo \"alias ali='source /cvmfs/alice.cern.ch/etc/login.sh'\"          \
-       >> $TEST_USER_HOME/.bashrc"
-
-# Root & AliRoot things
-RUN yum install -y $ROOT_REQ $ALIROOT_REQ
+RUN mkdir $CCTOOLS_PATH                                                                         && \
+    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6                                          && \ 
+    # Installing prerequisites.
+    yum install -y tar                                                                          && \
+    curl -o $CCTOOLS_PATH/cctools.tar.gz $CCTOOLS_URL                                           && \
+    tar -xvf $CCTOOLS_PATH/cctools.tar.gz -C$CCTOOLS_PATH                                       && \
+    # Setting up a test user
+    useradd -d $TEST_USER_HOME $TEST_USER                                                       && \
+    chown -R $TEST_USER $TEST_USER_HOME                                                         && \    
+    runuser -l $TEST_USER -c "echo \"alias ali='source /cvmfs/alice.cern.ch/etc/login.sh'\"        \                          
+       >> $TEST_USER_HOME/.bashrc"                                                              && \
+    # Root & AliRoot stuff
+    yum install -y $ROOT_REQ $ALIROOT_REQ
 
 # Condor setup.
 RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
