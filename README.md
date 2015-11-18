@@ -175,7 +175,7 @@ standard one automatically generated in `/etc/apparmor.d/docker` by docker daemo
 plus enabling `ptrace()`.
 An example of vanilla docker-default profile template could be:
 
-```C++
+```
 #include <tunables/global>
 
 
@@ -210,11 +210,13 @@ profile docker-default flags=(attach_disconnected,mediate_deleted) {
 Notice that editing thi file is quite useless since it's autmatilly generated everytime the 
 docker daemon starts up.
 So create your dummy `docker-allow-ptrace` file and add the rule:
-```C++
+
+```
 ptrace peer=@{profile_name}
 ```
+
 obtaining something like:
-```C++
+```
 
 #include <tunables/global>
 
