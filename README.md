@@ -118,9 +118,7 @@ params (it supports TAB-autocompletion for the < reponame >:< tag > arg):
     bash-4.1#
 
 ### Try parrot_run
-*...and eventually trigger your Mandatory Access Controllers*  
-Login as a test-user, in order to use parrot_run in a user-environment,
-as it was thought.
+Login as a test-user, in order to use parrot_run in a user-environment.
 You will find an environmental variable called TEST_USER.
 
     $ su $TEST_USER
@@ -134,12 +132,19 @@ if the last lines are telling you **something different** from:
 You are likely encountering some security problems related on what your MAC
 allows processes to do or not.
 
-#### Set Ubuntu Apparmor into complain mode
-<span style="color:red"> Please, notice that the following workaround
-is **temporary** and may low the security of your computer. I'm currently
-looking for a more elegant solution. </span>
+#### Apparmor
+**Don't disable your MACs, unless it's strictly unavoidable. They are good guys**
 
-On Ubuntu nodes it may happen that the last 4 lines of the output are:
+On Ubuntu or ubuntu-flavoured distros (e.g. Linux Mint) it's likely that apparmor won't let
+you [*trace your processes*](http://linux.die.net/man/2/ptrace). 
+I'm not intended to discuss pros and conts of this policy, or why, by default, docker containers 
+aren't allowed to ptrace any process but their children. 
+Here I just provide a canonic method to tell apparmor that you are aware of what are you doing 
+and that `ptrace` can be enabled for the session.
+Keeping in mind that run `--privileged` containers is even worse that set apparmor to 
+complain mode.
+If you are encountering something like this when debugging you `parrot_run` session, see the next 
+paragraph to exit this *empasse*.
 
     2015/07/06 12:52:42.40 parrot_run[9] debug: tracer_attach (tracer.c:105):
     ptrace error: Permission denied  
@@ -150,9 +155,9 @@ On Ubuntu nodes it may happen that the last 4 lines of the output are:
     goodbye!  
     Terminated
 
-You can eventually tail your kernel log:
+You can eventually tail your kernel log and spot the ptrace denial:
 
-    $ dmesg | tail -n1
+    $ dmesg | tail
     apparmor="DENIED" operation="ptrace" profile="docker-default" pid=2412 comm="parrot_run" requested_mask="trace" denied_mask="trace" peer="docker-default"
 
 Long story short: this is because Apparmor does not allow to "setuid root"
@@ -164,28 +169,96 @@ in common with the host OS. As we know the daemon runs under *setuid*
 permissions, thus it can be a security issue if it won't be *canonically* and
 securely solved.
 
-But until then the main goal is to setup a minimum ecosystem capable to do
-fundamental things, in a controlled test sandbox.
-To do this you have to
-Install the apparmor-utils:
+#### Allow Docker container to call ptrace()
+The goal is to create an apparmor profile for docker containers that is equivalent to the 
+standard one automatically generated in `/etc/apparmor.d/docker` by docker daemon at startup, 
+plus enabling `ptrace()`.
+An example of vanilla docker-default profile template could be:
 
-    $ sudo apt-get install apparmor-utils
+```C++
+#include <tunables/global>
 
-Now you must specify a profile to apply every time the docker daemon starts.
-A custom profile needs to be named as *path.to.docker.binary*.
-We are copying the default one /etc/apparmor.d/doker and renaming in the form
-we need.  
 
-    sudo cp /etc/apparmor.d/docker /etc/apparmor.d/`which docker | sed 's:/:.:g' | cut -c2-`
+profile docker-default flags=(attach_disconnected,mediate_deleted) {
 
-Then we have to force apparmor to a complain mode, in that way it will log
-every *naughty* operation but it won't block that.
+  #include <abstractions/base>
 
-    $ sudo aa-complain usr.bin.docker
-    Setting /etc/apparmor.d/usr.bin.docker to complain mode.
-    $ sudo service docker restart
 
-Now docker would be able to do **any** operation.
+  network,
+  capability,
+  file,
+  umount,
+
+  deny @{PROC}/{*,**^[0-9*],sys/kernel/shm*} wkx,
+  deny @{PROC}/sysrq-trigger rwklx,
+  deny @{PROC}/mem rwklx,
+  deny @{PROC}/kmem rwklx,
+  deny @{PROC}/kcore rwklx,
+
+  deny mount,
+
+  deny /sys/[^f]*/** wklx,
+  deny /sys/f[^s]*/** wklx,
+  deny /sys/fs/[^c]*/** wklx,
+  deny /sys/fs/c[^g]*/** wklx,
+  deny /sys/fs/cg[^r]*/** wklx,
+  deny /sys/firmware/efi/efivars/** rwklx,
+  deny /sys/kernel/security/** rwklx,
+}
+
+```
+Notice that editing thi file is quite useless since it's autmatilly generated everytime the 
+docker daemon starts up.
+So create your dummy `docker-allow-ptrace` file and add the rule:
+```C++
+ptrace peer=@{profile_name}
+```
+obtaining something like:
+```C++
+
+#include <tunables/global>
+
+
+profile docker-ptrace flags=(attach_disconnected,mediate_deleted) {
+
+  #include <abstractions/base>
+
+
+  network,
+  capability,
+  file,
+  umount,
+  ptrace peer=@{profile_name},
+
+  deny @{PROC}/{*,**^[0-9*],sys/kernel/shm*} wkx,
+  deny @{PROC}/sysrq-trigger rwklx,
+  deny @{PROC}/mem rwklx,
+  deny @{PROC}/kmem rwklx,
+  deny @{PROC}/kcore rwklx,
+
+  deny mount,
+
+  deny /sys/[^f]*/** wklx,
+  deny /sys/f[^s]*/** wklx,
+  deny /sys/fs/[^c]*/** wklx,
+  deny /sys/fs/c[^g]*/** wklx,
+  deny /sys/fs/cg[^r]*/** wklx,
+  deny /sys/firmware/efi/efivars/** rwklx,
+  deny /sys/kernel/security/** rwklx,
+}
+```
+
+and parse it with
+
+```bash
+sudo apparmor_parser -r docker-allow-ptrace
+```
+Now, when you want to run a container with ptrace permissions you have to pass a `security-opt` paramter.
+For example, in this case
+
+```bash
+docker run --rm -it --security-opt "apparmor:docker-ptrace" mconcas/centos6-autobuild-container /bin/bash
+```
 
 #### Selinux issues
 Currently I don't have encountered a really effective Selinux block for  
