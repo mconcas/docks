@@ -16,7 +16,7 @@ ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"                    
     
     # Compile flag
     MJ=9                                                                                           \
-    # Generic prerequisites
+    # Generic prerequisites, currently deprecated and not installed.
     COMM_REQ="git cmake tar unzip gcc gcc-c++ patch zlib-devel openssl-devel                       \
         openssl-devel make which vim libcap-2-devel"                                               \
     # Software-specific requisites
@@ -38,7 +38,7 @@ COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 RUN mkdir $CCTOOLS_PATH                                                                         && \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6                                          && \ 
     # Installing prerequisites.
-    yum install -y tar                                                                          && \
+    yum install -y which tar vim git                                                            && \
     curl -o $CCTOOLS_PATH/cctools.tar.gz $CCTOOLS_URL                                           && \
     tar -xvf $CCTOOLS_PATH/cctools.tar.gz -C$CCTOOLS_PATH                                       && \
     # Setting up a test user
