@@ -136,15 +136,15 @@ allows processes to do or not.
 **Don't disable your MACs, unless it's strictly unavoidable. They are good guys**
 
 On Ubuntu or ubuntu-flavoured distros (e.g. Linux Mint) it's likely that apparmor won't let
-you [*trace your processes*](http://linux.die.net/man/2/ptrace). 
+you [*trace your processes*](http://linux.die.net/man/2/ptrace).   
 I'm not intended to discuss pros and conts of this policy, or why, by default, docker containers 
-aren't allowed to ptrace any process but their children. 
+aren't allowed to ptrace any process but their children.   
 Here I just provide a canonic method to tell apparmor that you are aware of what are you doing 
-and that `ptrace` can be enabled for the session.
+and that `ptrace` can be enabled for the session.  
 Keeping in mind that run `--privileged` containers is even worse that set apparmor to 
-complain mode.
-If you are encountering something like this when debugging you `parrot_run` session, see the next 
-paragraph to exit this *empasse*.
+complain mode, one can find a way to figure it out how to get rid of this.  
+For example, in this particular case, if you are encountering something like the block below
+when debugging you `parrot_run` session, take a look to the next paragraph to exit this *empasse*.
 
     2015/07/06 12:52:42.40 parrot_run[9] debug: tracer_attach (tracer.c:105):
     ptrace error: Permission denied  
@@ -207,8 +207,7 @@ profile docker-default flags=(attach_disconnected,mediate_deleted) {
 }
 
 ```
-Notice that editing thi file is quite useless since it's autmatilly generated everytime the 
-docker daemon starts up.
+Notice that editing thi file is quite useless since it's re-generated everytime the docker daemon (re)starts up.
 So create your dummy `docker-allow-ptrace` file and add the rule:
 
 ```
@@ -270,7 +269,7 @@ Currently I don't have encountered a really effective Selinux block for
 You can use the *p_cvmfs_env.sh* located in /home/$TEST_USER to enter an
 environment properly configured with a working CVMFS implementation.
 
-    # su $TEST_USER
+    # su $TEST_USER
     $ . /home/parrotester/p_cvmfs_env.sh
     (parrot_env) [parrotester@xxx ~]$
     (parrot_env) [parrotester@xxx ~]$ ls /cvmfs/alice.cern.ch
