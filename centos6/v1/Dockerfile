@@ -13,7 +13,7 @@ ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"                    
     # CCTools
     CCTOOLS_URL=http://ccl.cse.nd.edu/software/files/cctools-5.2.3-x86_64-redhat6.tar.gz           \
     CCTOOLS_PATH=/opt/cctools                                                                      \
-    
+
     # Compile flag
     MJ=9                                                                                           \
     # Generic prerequisites, currently deprecated and not installed.
@@ -24,28 +24,29 @@ ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"                    
     # Root
     ROOT_REQ="autoconf automake libtool libxml2-devel libX11-devel libXpm-devel                    \
         libXft-devel libXext-devel mesa-libGLU-devel CGAL-devel subversion"                        \
-    
+
     # AliRoot
     ALIROOT_REQ="libXpm compat-libgfortran-41 tcl                                                  \
         compat-libtermcap redhat-lsb-core"                                                         \
 
     # Condor Password
-    CONDOR_SECRET="@mycondorpassword@"                                                                                                     
+    CONDOR_SECRET="@mycondorpassword@"
 
 # Adding interactive parrot-wrapper, useful for debug and develop.
 COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
-
+COPY opt/cern-it1.cern.ch.pub /etc/cvmfs/keys/cern.ch/cern-it1.cern.ch.pub
+RUN chown -R $TEST_USER /etc/cvmfs/keys/cern.ch/cern-it1.cern.ch.pub
 RUN mkdir $CCTOOLS_PATH                                                                         && \
     mkdir -p /cvmfs/.modulerc                                                                   && \
-    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6                                          && \ 
+    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6                                          && \
     # Installing prerequisites.
     yum install -y which tar vim git                                                            && \
     curl -o $CCTOOLS_PATH/cctools.tar.gz $CCTOOLS_URL                                           && \
     tar -xvf $CCTOOLS_PATH/cctools.tar.gz -C$CCTOOLS_PATH                                       && \
     # Setting up a test user
     useradd -d $TEST_USER_HOME $TEST_USER                                                       && \
-    chown -R $TEST_USER $TEST_USER_HOME                                                         && \    
-    runuser -l $TEST_USER -c "echo \"alias ali='source /cvmfs/alice.cern.ch/etc/login.sh'\"        \                          
+    chown -R $TEST_USER $TEST_USER_HOME                                                         && \
+    runuser -l $TEST_USER -c "echo \"alias ali='source /cvmfs/alice.cern.ch/etc/login.sh'\"        \
        >> $TEST_USER_HOME/.bashrc"                                                              && \
     # Root & AliRoot stuff
     yum install -y $ROOT_REQ $ALIROOT_REQ
