@@ -35,7 +35,6 @@ ENV TEST_USER="parrotuser" TEST_USER_HOME="/home/parrotuser"                    
 # Adding interactive parrot-wrapper, useful for debug and development.
 COPY opt/p_cvmfs_env.sh /home/$TEST_USER/p_cvmfs_env.sh
 COPY opt/cern-it1.cern.ch.pub /etc/cvmfs/keys/cern.ch/cern-it1.cern.ch.pub
-
 RUN mkdir $CCTOOLS_PATH                                                                         && \
     mkdir -p /cvmfs/.modulerc                                                                   && \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6                                          && \
