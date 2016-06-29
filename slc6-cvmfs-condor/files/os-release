@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export NAME="ScientificCERNSLC"
+export VERSION_ID="6.6"
