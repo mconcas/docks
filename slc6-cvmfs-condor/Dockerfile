@@ -13,4 +13,4 @@ COPY files/condor-container-pilot /tmp/condor-container-pilot
 
 RUN mkdir -p /cvmfs/alice-ocdb.cern.ch && mkdir -p /cvmfs/alice.cern.ch
 RUN chmod +x /tmp/condor-container-pilot
-ENTRYPOINT [ "entrypoint.sh" ]
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
