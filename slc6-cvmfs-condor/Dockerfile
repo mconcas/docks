@@ -4,7 +4,7 @@ ENV CONDOR_SECRET="@mycondorpassword@"
 
 RUN curl -o /etc/yum.repos.d/htcondor-development-rhel6.repo \
     http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-development-rhel6.repo && \
-    yum install -y condor
+    rpm --rebuilddb && yum install -y condor
 
 COPY files/os-release /etc/os-release
 COPY files/cern-it1.cern.ch.pub /etc/cvmfs/keys/cern.ch/cern-it1.cern.ch.pub
