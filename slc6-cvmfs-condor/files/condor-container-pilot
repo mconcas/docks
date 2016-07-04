@@ -24,10 +24,8 @@ if [ `id -u` != "0" ]; then
     exit 1
 fi
 
-set -e
 mount -t cvmfs alice-ocdb.cern.ch /cvmfs/alice-ocdb.cern.ch
 mount -t cvmfs alice.cern.ch /cvmfs/alice.cern.ch
-set +e
 
 echo -n "Copying credentials..."
 condor_store_cred add -c -p $CONDOR_SECRET &> /dev/null
